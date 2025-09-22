@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bgGradient)"/>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B0E0E6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ADD8E6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Globe circle -->
+  <circle cx="256" cy="200" r="120" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="8"/>
+  
+  <!-- Globe grid lines -->
+  <path d="M136 200 L376 200 M256 80 L256 320" stroke="rgba(255,255,255,0.6)" stroke-width="4"/>
+  <path d="M160 130 Q256 150 352 130 M160 270 Q256 250 352 270" stroke="rgba(255,255,255,0.6)" stroke-width="4" fill="none"/>
+  <path d="M190 200 Q256 120 322 200 Q256 280 190 200" stroke="rgba(255,255,255,0.6)" stroke-width="4" fill="none"/>
+  
+  <!-- Red star -->
+  <polygon points="180,150 190,180 220,180 200,200 210,230 180,210 150,230 160,200 140,180 170,180" fill="#dc2626"/>
+  
+  <!-- 3D Package/Box -->
+  <g transform="translate(280, 160)">
+    <!-- Main box face -->
+    <rect x="0" y="0" width="80" height="60" rx="4" fill="url(#boxGradient)"/>
+    <!-- Top face (3D effect) -->
+    <path d="M0 0 L20 -20 L100 -20 L80 0 Z" fill="#f87171" rx="2"/>
+    <!-- Right face (3D effect) -->
+    <path d="M80 0 L100 -20 L100 40 L80 60 Z" fill="#b91c1c"/>
+    <!-- Box details -->
+    <rect x="10" y="10" width="60" height="2" fill="rgba(0,0,0,0.2)"/>
+    <rect x="10" y="25" width="60" height="2" fill="rgba(0,0,0,0.2)"/>
+    <rect x="38" y="5" width="4" height="50" fill="rgba(0,0,0,0.1)"/>
+  </g>
+  
+  <!-- Currency symbols -->
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="white">¥</text>
+  <text x="200" y="420" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="rgba(255,255,255,0.8)">→</text>
+  <text x="312" y="380" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="white">₵</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="8" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="400" cy="400" r="12" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="450" cy="150" r="6" fill="rgba(255,255,255,0.4)"/>
+</svg>
