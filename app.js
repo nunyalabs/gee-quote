@@ -1,3 +1,19 @@
+// Polyfill for roundRect if needed
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        this.moveTo(x + r, y);
+        this.lineTo(x + w - r, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + r);
+        this.lineTo(x + w, y + h - r);
+        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        this.lineTo(x + r, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - r);
+        this.lineTo(x, y + r);
+        this.quadraticCurveTo(x, y, x + r, y);
+        this.closePath();
+    };
+}
+
 // Helper function to get element by ID
 const $ = (id) => document.getElementById(id);
 
@@ -46,6 +62,11 @@ const ctx = canvas.getContext('2d');
 let uploadedImage = null;
 let generatedImageDataUrl = null;
 
+// Helper to sanitize WhatsApp number (only digits allowed)
+function sanitizeWhatsAppNumber(number) {
+    return number.replace(/[^0-9]/g, '');
+}
+
 // Load saved business settings
 function loadBusinessSettings() {
     const savedBusinessName = localStorage.getItem('businessName') || 'openQuote';
@@ -61,8 +82,12 @@ function loadBusinessSettings() {
 
 // Save and apply business settings
 function saveBusinessSettings() {
+    // Sanitize WhatsApp number before saving
+    const sanitizedNumber = sanitizeWhatsAppNumber(whatsappNumberInput.value);
+    whatsappNumberInput.value = sanitizedNumber;
+    
     localStorage.setItem('businessName', businessNameInput.value);
-    localStorage.setItem('whatsappNumber', whatsappNumberInput.value);
+    localStorage.setItem('whatsappNumber', sanitizedNumber);
     localStorage.setItem('brandColor', brandColorInput.value);
     applyBusinessSettings();
 }
@@ -70,7 +95,7 @@ function saveBusinessSettings() {
 // Apply business settings to UI
 function applyBusinessSettings() {
     const businessName = businessNameInput.value || 'openQuote';
-    const whatsappNumber = whatsappNumberInput.value;
+    const whatsappNumber = sanitizeWhatsAppNumber(whatsappNumberInput.value);
     const brandColor = brandColorInput.value || '#87CEEB';
     
     // Update business name in header and footer
@@ -84,8 +109,8 @@ function applyBusinessSettings() {
         metaThemeColor.content = brandColor;
     }
     
-    // Update WhatsApp link
-    if (whatsappNumber) {
+    // Update WhatsApp link (only if number has digits)
+    if (whatsappNumber && whatsappNumber.length > 0) {
         whatsappContactLink.href = `https://wa.me/${whatsappNumber}`;
         whatsappContactLink.style.display = 'flex';
         footerSeparator.style.display = 'inline';
@@ -318,8 +343,12 @@ $('shareImageBtn').addEventListener('click', async () => {
             shareText += `\nContact: https://wa.me/${whatsappNumber}`;
         }
         
-        // Try native share
-        if (navigator.share && navigator.canShare({ files: [file] })) {
+        // Try native share (check if both share and canShare exist)
+        const canShare = navigator.share && 
+                        navigator.canShare && 
+                        navigator.canShare({ files: [file] });
+        
+        if (canShare) {
             await navigator.share({
                 title: `Quote for ${itemNameInput.value || 'Item'}`,
                 text: shareText,
@@ -327,8 +356,9 @@ $('shareImageBtn').addEventListener('click', async () => {
             });
         } else {
             // Fallback: open WhatsApp with text and download image
-            const whatsappUrl = whatsappNumber 
-                ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(shareText)}`
+            const sanitizedNumber = sanitizeWhatsAppNumber(whatsappNumber);
+            const whatsappUrl = sanitizedNumber 
+                ? `https://wa.me/${sanitizedNumber}?text=${encodeURIComponent(shareText)}`
                 : `https://wa.me/?text=${encodeURIComponent(shareText)}`;
             
             window.open(whatsappUrl, '_blank');
@@ -348,10 +378,12 @@ $('shareImageBtn').addEventListener('click', async () => {
     } catch (err) {
         // Fallback for errors
         const quoteData = calculate();
+        const businessName = businessNameInput.value || 'openQuote';
+        const sanitizedNumber = sanitizeWhatsAppNumber(whatsappNumberInput.value);
         let fallbackText = `🛍️ ${quoteData.item}\n💰 Price: GH₵ ${formatNumber(quoteData.ghsWithProfit, 0)}\n📦 Quantity: ${quoteData.quantity}\n\nContact ${businessName} for more details!`;
         
-        const whatsappUrl = whatsappNumber
-            ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(fallbackText)}`
+        const whatsappUrl = sanitizedNumber
+            ? `https://wa.me/${sanitizedNumber}?text=${encodeURIComponent(fallbackText)}`
             : `https://wa.me/?text=${encodeURIComponent(fallbackText)}`;
         
         window.open(whatsappUrl, '_blank');
@@ -366,22 +398,6 @@ $('shareImageBtn').addEventListener('click', async () => {
         document.body.removeChild(a);
     }
 });
-
-// Polyfill for roundRect if needed
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-        this.moveTo(x + r, y);
-        this.lineTo(x + w - r, y);
-        this.quadraticCurveTo(x + w, y, x + w, y + r);
-        this.lineTo(x + w, y + h - r);
-        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        this.lineTo(x + r, y + h);
-        this.quadraticCurveTo(x, y + h, x, y + h - r);
-        this.lineTo(x, y + r);
-        this.quadraticCurveTo(x, y, x + r, y);
-        this.closePath();
-    };
-}
 
 // Initialize
 loadBusinessSettings();
