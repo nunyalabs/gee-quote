@@ -344,37 +344,48 @@ $('shareImageBtn').addEventListener('click', async () => {
         }
         
         // Try native share (check if both share and canShare exist)
-        const canShare = navigator.share && 
-                        navigator.canShare && 
-                        navigator.canShare({ files: [file] });
+        let canShare = false;
+        try {
+            canShare = navigator.share && 
+                      navigator.canShare && 
+                      navigator.canShare({ files: [file] });
+        } catch (e) {
+            // canShare might not support files parameter
+            canShare = false;
+        }
         
         if (canShare) {
-            await navigator.share({
-                title: `Quote for ${itemNameInput.value || 'Item'}`,
-                text: shareText,
-                files: [file]
-            });
-        } else {
-            // Fallback: open WhatsApp with text and download image
-            const sanitizedNumber = sanitizeWhatsAppNumber(whatsappNumber);
-            const whatsappUrl = sanitizedNumber 
-                ? `https://wa.me/${sanitizedNumber}?text=${encodeURIComponent(shareText)}`
-                : `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-            
-            window.open(whatsappUrl, '_blank');
-            
-            // Download image
-            setTimeout(() => {
-                const a = document.createElement('a');
-                a.href = generatedImageDataUrl;
-                a.download = `${fileName}_quote_for_whatsapp.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                alert('💬 WhatsApp opened in new tab\n📸 Quote image downloaded\n\nPaste the image in your WhatsApp chat!');
-            }, 500);
+            try {
+                await navigator.share({
+                    title: `Quote for ${itemNameInput.value || 'Item'}`,
+                    text: shareText,
+                    files: [file]
+                });
+                return; // Exit if share was successful
+            } catch (shareErr) {
+                // Fall through to fallback if share was cancelled or failed
+            }
         }
+        
+        // Fallback: open WhatsApp with text and download image
+        const sanitizedNumber = sanitizeWhatsAppNumber(whatsappNumber);
+        const whatsappUrl = sanitizedNumber 
+            ? `https://wa.me/${sanitizedNumber}?text=${encodeURIComponent(shareText)}`
+            : `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        
+        window.open(whatsappUrl, '_blank');
+        
+        // Download image
+        setTimeout(() => {
+            const a = document.createElement('a');
+            a.href = generatedImageDataUrl;
+            a.download = `${fileName}_quote_for_whatsapp.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            alert('💬 WhatsApp opened in new tab\n📸 Quote image downloaded\n\nPaste the image in your WhatsApp chat!');
+        }, 500);
     } catch (err) {
         // Fallback for errors
         const quoteData = calculate();
