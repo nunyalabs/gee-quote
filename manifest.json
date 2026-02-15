@@ -1,7 +1,7 @@
 {
-  "name": "Quick Quote by geeLogistics - RMB to GHS Calculator", 
-  "short_name": "geeQuote",
-  "description": "Professional quote calculator by geeLogistics for RMB to GHS conversions with shareable cards",
+  "name": "openQuote - Universal Quote Calculator", 
+  "short_name": "openQuote",
+  "description": "Universal professional quote calculator for currency conversions with shareable cards",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
